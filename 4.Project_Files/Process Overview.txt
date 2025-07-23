@@ -1,0 +1,25 @@
+Build the Project Overview Diagram for the project
+							|
+							|
+Build the Entity Relationship diagram for the project
+							|
+							|
+Build the Section level diagram for the project
+							|
+							|
+Build the Table level diagram for the project (identify Variable definition if any)
+							|
+							|
+Identify the fields useds in each table(identify Variable definition and computed fields if any) Excel
+							|
+							|
+Create a data flow diagram for each section and identify the input and output fields
+							|
+							|
+Make the lise of expected outcomes for each section and validate the data to identify if the expectations were meet
+
+Transaction Master
+Original Invoice Data
+Changed Invoice Data
+Transaction History
+Vendor Master
