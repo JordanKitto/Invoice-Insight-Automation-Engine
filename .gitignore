@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+settings.json
+
+# Output files and sensitive data
+2.Output_Files/
+*.csv
+*.xlsx
+*.vsdx
+*.txt
+
+# Secrets
+.env
+5.Config/db_config.py
+5.Config/.env
