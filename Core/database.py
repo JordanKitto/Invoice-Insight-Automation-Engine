@@ -36,6 +36,44 @@ class OracleConnection:
             # Close the connection regardless of errors
             cursor.close()
 
+    # Run query and fetch in batches for improve performance
+    def run_in_batches(self, query: str, batch_size: int = 10000):
+        cursor = self.conn.cursor()
+        cursor.execute(query)
+        columns = [col[0] for col in cursor.description]
+        while True:
+            rows = cursor.fetchmany(batch_size)
+            if not rows:
+                break
+            # Use a generator to run data one batch at a time
+            yield columns, rows
+
+
+    
+    def get_row_count(self, query: str) -> int:
+        """
+        Returns the total number of rows the original query would return.
+        """
+        count_query = self.build_count_query(query)
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(count_query)
+            count = cursor.fetchone()[0]
+            return count
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def build_count_query(query: str) -> str:
+        """
+        Converts the provided SQL query into a COUNT(*) version by:
+        - Finding the FROM clause
+        - Wrapping the original query as a subquery
+            
+        This assumes the original query is a valid SELECT query.
+        """
+        return f"SELECT COUNT(*) FROM ({query}) subquery"
+
     # Close connection efficiently
     def close(self):
         if self.conn:
