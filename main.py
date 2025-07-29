@@ -46,7 +46,7 @@ def main():
             total_rows += len(rows)
             first_batch = False
             # Update progress bar
-            progress.update(current_row_count=total_rows)
+            progress.update(total_rows)
 
         timer.stop()
         progress.stop()
