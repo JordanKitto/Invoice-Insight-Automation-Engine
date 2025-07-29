@@ -1,7 +1,12 @@
-Python Invoice Optimisation Report - Oracle Data Export Tool
+# Python Invoice Optimisation Report - Oracle Data Export Tool
 
-This project is a modular Python tool that connects to an Oracle database, runs a SQL query from a file, and exports the results to a CSV. It handles large datasets in batches and includes a timer and estimated time remaining.
-Features
+## Project Purpose
+
+This project is designed to automate the generation of the **Invoice Optimisation Report** used by the Queensland Health Statewide Accounts Payable team. It will run **nine specific Oracle SQL scripts in sequence**, each exporting key datasets used to identify issues with the OCR (Optical Character Recognition) engine that processes over **1.8 million invoices per year**.
+
+The ultimate goal is to **improve zero-touch invoice processing rates** by providing timely insights and highlighting common exceptions and errors in vendor setup, payment terms, and invoice formatting. This tool replaces manual Excel-based workflows, significantly reducing overhead and increasing processing efficiency.
+
+---
 
     Connects to Oracle using oracledb
 
