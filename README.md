@@ -71,3 +71,13 @@ Notes
     ETA calculated from COUNT(*) before batch fetch
 
     Clean error handling and graceful shutdown
+    
+Future Enhancements
+
+    Add CLI arguments to run selected SQL scripts
+
+    Combine all exports into a zipped archive
+
+    Integrate post-processing/analysis phase for exception tracking
+
+    Schedule via Windows Task Scheduler or cron for automation
