@@ -7,6 +7,7 @@ This project is designed to automate the generation of the **Invoice Optimisatio
 The ultimate goal is to **improve zero-touch invoice processing rates** by providing timely insights and highlighting common exceptions and errors in vendor setup, payment terms, and invoice formatting. This tool replaces manual Excel-based workflows, significantly reducing overhead and increasing processing efficiency.
 
 ---
+Features
 
     Connects to Oracle using oracledb
 
