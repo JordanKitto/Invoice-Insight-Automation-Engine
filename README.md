@@ -6,6 +6,9 @@ This project is designed to automate the generation of the **Invoice Optimisatio
 
 The ultimate goal is to **improve zero-touch invoice processing rates** by providing timely insights and highlighting common exceptions and errors in vendor setup, payment terms, and invoice formatting. This tool replaces manual Excel-based workflows, significantly reducing overhead and increasing processing efficiency.
 
+
+<img width="389" height="211" alt="image" src="https://github.com/user-attachments/assets/d65f84e5-5dbf-44a7-a750-09130c040cb1" />
+
 ---
 Features
 
