@@ -17,6 +17,9 @@ def main():
     print("🔌 Connecting to Oracle DB...")
     db = OracleConnection(DB_CONFIG)
 
+    timer = ElapsedTimer()
+    timer.start()
+
     try:
         # Establish database connection
         db.connect()
@@ -27,45 +30,44 @@ def main():
         query = load_sql(sql_path)
         print("Running query from", sql_path)
 
-        # Run COUNT(*) version of query to estimate total rows for progress tracking
+        # Run COUNT(*) version of query to estimate total rows
         count_query = OracleConnection.build_count_query(query)
-        count_columns, count_rows = db.run_query(count_query)
-        total_expected_rows = count_rows[0][0]  # Extract COUNT value
-        print(f"🧮 Total expected rows: {total_expected_rows}")
+        _, count_rows = db.run_query(count_query)
+        total_expected_rows = count_rows[0][0]
+        print(f"🧮 Total expected rows: {total_expected_rows:,}")
 
-        # Start elapsed timer in background
-        timer = ElapsedTimer()
-        timer.start()
-
-        # Set up progress tracker with known total rows
         progress = ProgressTracker(total_rows=total_expected_rows)
 
-        # Prepare output file with timestamp
+        # Prepare output file
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        output_file = f"vendor_master_{timestamp}.csv"
+        output_file = f"vendor_master_JordanTest.csv"
 
-        total_rows = 0
+        total_rows_processed = 0
         first_batch = True
 
-        # Fetch and export data in batches
+        
+
+        # Batch fetch and export loop
         for columns, rows in db.run_in_batches(query, batch_size=10000):
             export_to_csv(
                 columns,
                 rows,
                 filename=output_file,
-                append=not first_batch,  # Append from second batch onwards
+                append=not first_batch,
                 log_progress=False
             )
-            total_rows += len(rows)
+
+            total_rows_processed += len(rows)
             first_batch = False
 
-            # Update progress bar with current row count
-            progress.update(total_rows)
+            # Update progress tracker
+            progress.update(total_rows_processed)
 
-        # Stop progress indicators
+        # Finalize
         timer.stop()
         progress.finish()
-        print(f"\n📊 Rows: {total_rows}")
+        print(f"\n📊 Rows exported: {total_rows_processed:,}")
+        print(f"⏱️ Elapsed time: {timer.get_elapsed_time()}")
 
     except Exception as e:
         print("❌ Error:", e)
