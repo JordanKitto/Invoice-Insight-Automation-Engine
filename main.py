@@ -3,6 +3,7 @@ from Core.database import OracleConnection
 from Utils.export import export_to_csv
 from Utils.timer import ElapsedTimer
 from Utils.progress import ProgressTracker
+from Utils.flag_file import Flagfile
 
 import os
 import time
@@ -14,6 +15,11 @@ def load_sql(file_path: str) -> str:
 
 # Main entry point for the batch export job
 def main():
+
+    # remove done.txt file if it already exists
+    done_path = os.path.join("Output_files", "done.txt")
+    Flagfile.remove(done_path)
+
     print("🔌 Connecting to Oracle DB...")
     db = OracleConnection(DB_CONFIG)
 
@@ -45,8 +51,7 @@ def main():
         total_rows_processed = 0
         first_batch = True
 
-        
-
+    
         # Batch fetch and export loop
         for columns, rows in db.run_in_batches(query, batch_size=10000):
             export_to_csv(
@@ -68,12 +73,18 @@ def main():
         progress.finish()
         print(f"\n📊 Rows exported: {total_rows_processed:,}")
         print(f"⏱️ Elapsed time: {timer.get_elapsed_time()}")
-
+        
+        # Run done.txt function after script has been exported
+        if total_rows_processed == total_expected_rows:
+            done_path = os.path.join("Output_files", "done.txt")
+            Flagfile.create(path=done_path, message="VENDOR MASTER EXPORT COMPLETE")
+            
     except Exception as e:
         print("❌ Error:", e)
 
     finally:
         db.close()
+        # Remove existing done.txt before run starts
         print("🔒 Connection closed.")
 
 # Script execution entry point
