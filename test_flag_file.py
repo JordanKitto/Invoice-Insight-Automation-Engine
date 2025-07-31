@@ -1,13 +1,18 @@
-from Utils.flag_file import Flagfile
+from datetime import *
+import pandas as pd
+import os
 
-# Remove any existing flag
-Flagfile.remove("done.txt")
+user = 'Jordan'
+message = ' Hello world'
+current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-# Create a new flag with a message
-Flagfile.create(path="done.txt", message="Test run complete.")
+dictionary = {
+    "User": [user],
+    "Message": [message],
+    "Date": [current_date]
+}
 
-# Confirm the file was created
-with open("done.txt", "r", encoding="utf-8") as f:
-    contents = f.read()
+df = pd.DataFrame(dictionary)
 
-print("Contents of done.txt:", contents)
+test = os.path.join(os.path.expanduser("~"), "/Documents")
+print(test)
