@@ -36,6 +36,6 @@ def export_to_csv(columns, rows, filename=None, filename_prefix="export", append
         df.to_csv(filepath, index=False)  # Create new file or overwrite
 
     if log_progress:
-        print(f"📦 Exported CSV to: {filepath}")  # Optional console output
+        print(f"Exported CSV to: {filepath}")  # Optional console output
 
     return filepath  # Return path for reference or logging
