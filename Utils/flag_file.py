@@ -8,7 +8,7 @@ class Flagfile:
     def create(path="done.txt", message="SUCCESS"):
         with open(path, "w", encoding="utf-8") as f:
             f.write(message)
-            print("✅ done.txt created")
+            print("done.txt created")
 
     @staticmethod
     def remove(path="done.txt"):

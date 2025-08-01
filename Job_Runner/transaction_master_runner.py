@@ -14,7 +14,6 @@ class TransactionMasterJob:
         self.output_file = "transaction_master.csv"
 
     def run(self):
-        print("Starting Transaction Master job...")
         # set up db connection with pre built config
         db = OracleConnection(DB_CONFIG)
         # start measuring how long the job takes to run
@@ -23,16 +22,16 @@ class TransactionMasterJob:
 
         try:
             db.connect()
-            print("✅ Connected to Oracle.")
+            print("Connected to Oracle.")
 
             with open(self.sql_file, "r", encoding="utf-8") as f:
                 query = f.read()
-                print(f"📄 Loaded SQL from {self.sql_file}")
+                print(f"Loaded SQL from {self.sql_file}")
 
                 count_query = OracleConnection.build_count_query(query)
                 _, count_rows = db.run_query(count_query)
                 total_expected_rows = count_rows[0][0]
-                print(f"🧮 Estimated total rows: {total_expected_rows:,}")
+                print(f"Estimated total rows: {total_expected_rows:,}")
 
                 progress = ProgressTracker(total_rows=total_expected_rows)
                 output_file = self.output_file
@@ -53,17 +52,17 @@ class TransactionMasterJob:
 
                 timer.stop()
                 progress.finish()
-                print(f"\n📊 Rows exported: {total_rows_processed:,}")
-                print(f"⏱️ Elapsed time: {timer.get_elapsed_time()}")
+                print(f"\nRows exported: {total_rows_processed:,}")
+                print(f"Elapsed time: {timer.get_elapsed_time()}")
 
                 if total_rows_processed == total_expected_rows:
                     Flagfile.create(path=os.path.join("Output_Files", "done.txt"),
                                     message="TRANSACTION MASTER COMPLETE")
         except Exception as e:
-            print("❌ Vendor Master Error:", e)
+            print("Vendor Master Error:", e)
         finally:
             db.close()
-            print("🔒 Transaction Master Connection closed.")
+            print("Transaction Master Connection closed.")
 
 def main():
     job = TransactionMasterJob()

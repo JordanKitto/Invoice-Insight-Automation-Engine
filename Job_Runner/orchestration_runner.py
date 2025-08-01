@@ -1,6 +1,13 @@
-from Job_Runner import vendor_master_runner, transaction_master_runner
+from Job_Runner.vendor_master_runner import VendorMasterJob
+from Job_Runner.transaction_master_runner import TransactionMasterJob
+from Core.database import OracleConnection
+from Config.db_config import DB_CONFIG
+
 import os
 import time
+
+def __init__(self, db):
+    self.db = db
 
 def run_step(step_name, runner_function):
     print(f"Starting step: {step_name}")
@@ -24,10 +31,19 @@ def run_step(step_name, runner_function):
     return True
 
 def main():
-    if not run_step("Vendor Master Export", vendor_master_runner.main):
-        return
-    if not run_step("Transaction Master Export", transaction_master_runner.main):
-        return
+    db = OracleConnection(DB_CONFIG)
+    print("Connecting to DB")
+    try:
+        db.connect()
+        print("DB connection successful")
+
+        if not run_step("Vendor Master Export", VendorMasterJob(), db):
+            return
+        if not run_step("Transaction Master Export", TransactionMasterJob(), db):
+            return
+    finally:
+        db.close
+        print("DB connection closed.")
     
 if __name__ == "__main__":
     main()

@@ -13,7 +13,6 @@ class VendorMasterJob:
         self.output_file = "vendor_master.csv"
 
     def run(self):
-        print("Starting Vendor Master Export...")
         db = OracleConnection(DB_CONFIG)
         timer = ElapsedTimer()
         timer.start()
