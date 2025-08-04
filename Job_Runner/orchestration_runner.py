@@ -9,9 +9,9 @@ import time
 def __init__(self, db):
     self.db = db
 
-def run_step(step_name, runner_function):
+def run_step(step_name, runner_function, db):
     print(f"Starting step: {step_name}")
-    runner_function()
+    runner_function(db)
 
     # Wait for corresponding done.txt
     done_file = os.path.join("Output_Files", "done.txt")
@@ -37,9 +37,11 @@ def main():
         db.connect()
         print("DB connection successful")
 
-        if not run_step("Vendor Master Export", VendorMasterJob(), db):
+        vendor_job = VendorMasterJob()
+        transaction_job = TransactionMasterJob()
+        if not run_step("Vendor Master Export",vendor_job.run, db):
             return
-        if not run_step("Transaction Master Export", TransactionMasterJob(), db):
+        if not run_step("Transaction Master Export",transaction_job.run, db):
             return
     finally:
         db.close

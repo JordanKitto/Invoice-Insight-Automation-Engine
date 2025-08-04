@@ -12,16 +12,11 @@ class VendorMasterJob:
         self.sql_file = os.path.join("SQL", "vendor_master.sql")
         self.output_file = "vendor_master.csv"
 
-    def run(self):
-        db = OracleConnection(DB_CONFIG)
+    def run(self, db):
         timer = ElapsedTimer()
         timer.start()
 
         try:
-            db.connect()
-            print("Connected to Oracle.")
-
-            # Ensure output directory exists
             os.makedirs("Output_Files", exist_ok=True)
 
             with open(self.sql_file, "r", encoding="utf-8") as f:
@@ -63,8 +58,8 @@ class VendorMasterJob:
         except Exception as e:
             print("Vendor Master Error:", e)
         finally:
-            db.close()
-            print("Vendor Master Connection closed.")
+            # db.close()
+            print("Vendor Master run complete.")
 
 def main():
     job = VendorMasterJob()
