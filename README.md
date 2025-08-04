@@ -2,87 +2,180 @@
 
 ## Project Purpose
 
-This project is designed to automate the generation of the **Invoice Optimisation Report** used by the Queensland Health Statewide Accounts Payable team. It will run **nine specific Oracle SQL scripts in sequence**, each exporting key datasets used to identify issues with the OCR (Optical Character Recognition) engine that processes over **1.8 million invoices per year**.
+## Overview
 
-The ultimate goal is to **improve zero-touch invoice processing rates** by providing timely insights and highlighting common exceptions and errors in vendor setup, payment terms, and invoice formatting. This tool replaces manual Excel-based workflows, significantly reducing overhead and increasing processing efficiency.
+This project powers the Invoice Optimisation Report for the Queensland Health Statewide Accounts Payable team, automating the daily extraction and analysis of critical invoice exception data from SAP, DSS, and other upstream sources.
 
+Each year, Queensland Health processes over 1.8 million invoices totaling more than $10.56 billion AUD. Despite adopting OCR (Optical Character Recognition) technology with an expected 80% zero-touch success rate, performance remains stagnant at ~30% even after 5 years.
 
-<img width="529" height="529" alt="image" src="https://github.com/user-attachments/assets/8aabd909-ba28-482e-9a3f-d2859d048bd5" />
+Through this project, we’ve:
 
+    Identified 9 systemic OCR failure points, including:
+
+    Missing or incorrectly read Company Code, ABN, Invoice Number, Amount, Vendor Name, and Vendor Number.
+
+    Replaced manual Excel- and KNIME-based workflows with a fully automated Python + SQL pipeline.
+
+    Reduced processing time from 2.5 hours daily to under 30 minutes, freeing up staff and computing resources.
+
+    Scheduled automation to run before business hours, ensuring timely delivery of insights to SAP developers and stakeholders.
+
+The end-to-end system executes nine custom Oracle SQL scripts, processes and exports datasets in batches, and tracks key performance indicators on OCR failures to guide SAP enhancement work.
+
+## Why This Matters
+
+This tool directly supports multi-million dollar efficiency initiatives within Queensland Health by:
+
+    Highlighting OCR blind spots preventing automatic invoice posting
+
+    Delivering actionable analytics to the SAP development team
+
+    Providing visibility into statewide vendor compliance and data hygien
 
 ---
-Features
+## Image of automated script running in terminal
+<img width="529" height="529" alt="image" src="https://github.com/user-attachments/assets/8aabd909-ba28-482e-9a3f-d2859d048bd5" />
 
-    Connects to Oracle using oracledb
+---
 
-    Executes SQL query from .sql file
+## Features
 
-    Exports results to timestamped CSV
+- **Modular OOP Design**  
+  Each job (e.g., `vendor_master`, `transaction_master`) is isolated in its own runner class using single-responsibility principles. Utilities like timers, progress tracking, flag files, and exports are abstracted into reusable modules.
 
-    Streams data in batches to reduce memory usage
+- **Oracle Integration**  
+  Uses `oracledb` to connect to an Oracle database with secure credentials stored in a centralized `Config/db_config.py`.
 
-    Displays elapsed time while running
+- **Batch Query Execution**  
+  Streams large datasets in **batches of 10,000 rows** to prevent memory overflows and improve performance.
 
-    Estimates time remaining using total row count
+- **Live Progress Tracking**  
+  Displays both real-time progress (rows fetched) and estimated time remaining using a `COUNT(*)` pre-query.
+  
+- **Export to CSV**  
+  Automatically saves results into cleanly named CSV files under `Output_Files/`, with optional timestamping.
 
-    Uses object-oriented design with clear file separation
+- **Flag-Based Orchestration**  
+  Each job writes a `.txt` flag file (e.g., `done.txt`) to coordinate the sequence of multi-job pipelines.
 
+- **Shared DB Connection**  
+  Optimized to connect to the database **once per run**, reducing latency and preventing reconnection issues.
 
-    Install dependencies:
-    pip install oracledb pandas
+- **Clear Error Handling**  
+  Logs descriptive errors and ensures graceful shutdown of open resources.
 
-    Configure your database settings in Config/db_config.py:
-    DB_CONFIG = {
+---
+
+## Installation
+
+- pip install oracledb pandas.
+---
+
+## Configuration
+
+- Configure your database settings in Config/db_config.py:
+```
+DB_CONFIG = {
     "hostname": "your_host",
     "port": 1521,
     "service_name": "your_service",
     "user": "your_username",
     "password": "your_password"
-    }
+}
 
-    Add your SQL query to SQL/vendor_master.sql.
 
-Usage
+Add your SQL query to:
+SQL/vendor_master.sql
+```
+---
 
-Run the script:
-python main.py
+## Folder Structure
+
+```.
+├── Config/
+│   └── db_config.py
+├── Core/
+│   └── database.py
+├── Job_Runner/
+│   ├── vendor_master_runner.py
+│   ├── transaction_master_runner.py
+│   └── orchestration_runner.py
+├── Utils/
+│   ├── export.py
+│   ├── flag_file.py
+│   ├── progress.py
+│   └── timer.py
+├── SQL/
+│   └── vendor_master.sql
+├── Output_Files/
+├── main.py
+```
+---
+## Usage
+
+Call python main.py in the terminal
 
 The script will:
 
-    Connect to Oracle
+    Connect to Oracle once
 
-    Run a COUNT(*) version of the query to get total row estimate
+    Run each export job (e.g., Vendor Master, Transaction Master)
 
-    Stream results in batches (default 10,000)
+    Count total rows via COUNT(*)
 
-    Display elapsed time and estimated time remaining
+    Stream results in batches
 
-    Save results to Output_Files/vendor_master_<timestamp>.csv
+    Track progress and ETA
 
-Customization
+    Save results to .csv
 
-    To change batch size, update batch_size in main.py
+    Create a done.txt flag when each job is complete
+---
 
-    To use a different query, change SQL file in main.py
+## Customization
+```
+Option	Location
+SQL file to run	SQL/*.sql
+Batch size	Core/database.py → run_in_batches(batch_size=...)
+Output file format	Defined inside each runner class
+Timeout handling	orchestration_runner.py → run_step() logic
+```
+---
 
-    To change file name format, adjust output_file naming in main.py
+## Notes
 
-Notes
+    Efficient memory use via Python generators
 
-    Efficient memory usage with fetch generator
+    Threaded timer for accurate wall-time reporting
 
-    Threaded live timer
+    Modular design for future extensibility
 
-    ETA calculated from COUNT(*) before batch fetch
+    Explicit file/directory validation for safety
+---
 
-    Clean error handling and graceful shutdown
-    
-Future Enhancements
+## Future Enhancements
 
-    Add CLI arguments to run selected SQL scripts
+    Add CLI interface to select and run specific jobs
 
-    Combine all exports into a zipped archive
+    Export all outputs into a single ZIP archive
 
-    Integrate post-processing/analysis phase for exception tracking
+    Integrate exception reporting or summary analysis
 
-    Schedule via Windows Task Scheduler or cron for automation
+    Add logging framework (e.g., loguru, logging)
+
+    Deploy as a Windows Task or cron job for automation
+
+    Build Power BI hooks for post-export analysis
+---
+
+## Why This Project Matters
+
+    Build maintainable ETL-style automation
+
+    Manage large datasets from enterprise systems like Oracle
+
+    Design clean, modular, production-ready Python code
+
+    Apply concepts like batch processing, ETA logic, and orchestration
+
+    Prepare for roles in Data Engineering, Automation, or Backend Python Development
