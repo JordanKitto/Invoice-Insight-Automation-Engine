@@ -13,16 +13,14 @@ class TransactionMasterJob:
         self.sql_file = os.path.join("SQL", "transaction_master.sql")
         self.output_file = "transaction_master.csv"
 
-    def run(self):
-        # set up db connection with pre built config
-        db = OracleConnection(DB_CONFIG)
+    def run(self, db):
         # start measuring how long the job takes to run
         timer = ElapsedTimer()
         timer.start()
 
         try:
-            db.connect()
-            print("Connected to Oracle.")
+            os.makedirs("Output_Files", exist_ok=True)
+
 
             with open(self.sql_file, "r", encoding="utf-8") as f:
                 query = f.read()
